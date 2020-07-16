@@ -96,8 +96,9 @@ class FileParser
         current_user = User.new(attributes: parse_lines(line, User::USER_FIELDS))
         users_objects << current_user
       when User::SESSION_COLUMN
-        all_sessions << parse_lines(line, User::SESSION_FIELDS)
-        current_user.sessions << parse_lines(line, User::SESSION_FIELDS)
+        current_session = parse_lines(line, User::SESSION_FIELDS)
+        all_sessions << current_session
+        current_user.sessions << current_session
       else
         raise 'Non expected line'
       end

@@ -1,4 +1,4 @@
-require 'refactored_task'
+require './refactored_task'
 
 class TestMe < Minitest::Test
   def setup
