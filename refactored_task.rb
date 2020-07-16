@@ -1,29 +1,3 @@
-# Тут находится программа, выполняющая обработку данных из файла.
-# Тест показывает как программа должна работать.
-# В этой программе нужно обработать файл данных data_large.txt.
-
-# Отчёт в json
-#   - Сколько всего юзеров +
-#   - Сколько всего уникальных браузеров +
-#   - Сколько всего сессий +
-#   - Перечислить уникальные браузеры в алфавитном порядке через запятую и капсом +
-#
-#   - По каждому пользователю
-#     - сколько всего сессий +
-#     - сколько всего времени +
-#     - самая длинная сессия +
-#     - браузеры через запятую +
-#     - Хоть раз использовал IE? +
-#     - Всегда использовал только Хром? +
-#     - даты сессий в порядке убывания через запятую +
-
-# Ожидания от результата:
-
-# Корректная обработатка файла data_large.txt;
-# Проведена оптимизация кода и представлены ее результаты;
-# Production-ready код;
-# Применены лучшие практики;
-
 require 'json'
 require 'pry'
 require 'date'
@@ -69,7 +43,7 @@ class FileParser
 
     report[:allBrowsers] = all_uniq_sorted_browsers.map(&:upcase).join(',')
 
-    # Статистика по пользователям
+    # User statistics
     report[:usersStats] = {}
 
     users_objects.each do |user|
@@ -143,30 +117,20 @@ class FileParser
   def report_keys
     # us - user_sessions
     {
-      # Собираем количество сессий по пользователям
+      # Collect user sessions count
       sessions_count:     ->(us) { { sessionsCount: us.count } },
-      # Собираем количество времени по пользователям
+      # Collect user's total time
       total_time:         ->(us) { { totalTime: us.map{ |s| s[:time].to_i }.sum.to_s + ' min.' } },
-      # Выбираем самую длинную сессию пользователя
+      # Select the longest user session
       longest_session:    ->(us) { { longestSession: us.map{ |s| s[:time].to_i }.max.to_s + ' min.' } },
-      # Браузеры пользователя через запятую
+      # User's browsers list
       browsers:           ->(us) { { browsers: us.map {|s| s[:browser].upcase }.sort.join(', ') } },
-      # Хоть раз использовал IE?
+      # Check if user used IE
       used_ie:            ->(us) { { usedIE: us.map{|s| s[:browser]}.uniq.any? { |b| b.upcase =~ /INTERNET EXPLORER/ } } },
-      # Всегда использовал только Chrome?
+      # Check if user always used Chrome?
       always_used_chrome: ->(us) { { alwaysUsedChrome: us.map { |s| s[:browser] }.uniq.all? { |b| b.upcase =~ /CHROME/ } } },
-      # Даты сессий через запятую в обратном порядке в формате iso8601
+      # Session dates in the reverse order in iso8601 format
       dates:              ->(us) { { dates: us.map {|s| Date.parse(s[:date]).iso8601 }.sort.reverse } }
     }
   end
 end
-
-# require 'benchmark'
-# Benchmark.bm do |x|
-#   x.report do
-#     FileParser.new('data_large.txt', 'result_large.json').work
-#   end
-# end
-#
-# user        system      total       real
-# 153.723993  11.145321   164.869314  (173.480371)
